@@ -1,0 +1,36 @@
+import gensim.downloader as api
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+model=api.load("word2vec-google-news-300")
+tech_words=[
+    "computer","data","hardware","software","internet",
+    "database","algorithm","network","server","programming"
+]
+
+vectors=[model[word]for word in tech_words]
+
+pca=PCA(n_components=2)
+vectors_2d=pca.fit_transform(vectors)
+plt.figure(figsize=(8,6))
+
+for i,word in enumerate(tech_words):
+    x,y=vectors_2d[i]
+    plt.scatter(x,y,marker='o',color='blue')
+    plt.text(x+0.02,y+0.02,word,fontsize=12)
+plt.title("2 D Projection of Related Words")
+plt.xlabel("PCA 1")
+plt.ylabel("PCA 2")
+plt.grid(True)
+plt.show()
+
+def generate_similar_words(input_word,topn=5):
+    try:
+        similar_words=model.most_similar(positive=[input_word],topn=topn)
+        print(f"Top {topn} similar words to '{input_word}' are: ")
+        for word,similarity in similar_words:
+            print(f"{word} Similarity={similarity:.4f}")
+    except:
+        print(f"The '{input_word}'is not in vocabulary. ")
+
+user_input="internet"
+generate_similar_words(user_input)
